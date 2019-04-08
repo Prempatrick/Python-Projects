@@ -250,16 +250,44 @@ order_prior= order_prior.sort_values(by=['user_id', 'order_id'])
 # Performing
 
 mt= pd.merge(order_product_prior,products, on= ['product_id','product_id'])
+mt= pd.merge(mt,orders,on=['order_id', 'order_id'] )
 mt = pd.merge(mt,department,on=['department_id','department_id'])
 mt= pd.merge(mt,aisles,on=['aisle_id','aisle_id'])
 
 
+
+
+mt.columns
+
 # Checking the unique aisles
 len(mt['aisle'].unique())
- print("There are {} unique aisles in the dataset". format(len(mt['aisle'].unique())))
+print("There are {} unique aisles in the dataset".format(len(mt['aisle'].unique())))
+
+cust_prod=  pd.crosstab(mt['user_id'],mt['aisle'])
+
+cust_prod.shape
 
 
-# 
+# Applying PCA decomposition to the cust_prod Datasets 
+
+from sklearn.decomposition import PCA
+pca= PCA(n_components=6)
+pca.fit(cust_prod)
+pca_samples= pca.transform(cust_prod)
+
+
+ps= pd.DataFrame(pca_samples)
+
+import matplotlib.pyplot as plt 
+from mpl_toolkits.mplot3d import  Axes3D
+from mpl_toolkits.mplot3d import proj3d
+tocluster= pd.DataFrame(ps[[4,1]])
+print(tocluster.shape)
+print(tocluster.head())
+
+
+fig= plt.figure(figsize=(8,8))
+plt.plot(tocluster[4],tocluster[1],'o',markersize=2, color='blue',alpha=0.2,label='class1')
 
 
 
@@ -269,13 +297,6 @@ len(mt['aisle'].unique())
 
 
 
-
-
-
-
-
-
-# Now we check the most reordered products
 
 
 
